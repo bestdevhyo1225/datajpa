@@ -3,7 +3,6 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.entity.Member;
 
@@ -14,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@Rollback(false) // 실무에선 옵션 끄도록
 class MemberJpaRepositoryTest {
 
     @Autowired
@@ -58,19 +56,19 @@ class MemberJpaRepositoryTest {
         // 리스트 조회 검증
         List<Member> members = memberJpaRepository.findAll();
 
-        assertThat(members.size()).isEqualTo(2);
+        assertThat(members.size()).isEqualTo(7);
 
         // 카운트 검증
         long count = memberJpaRepository.count();
 
-        assertThat(count).isEqualTo(2);
+        assertThat(count).isEqualTo(7);
 
         // 삭제 검증
         memberJpaRepository.delete(member1);
         memberJpaRepository.delete(member2);
 
         long deletedCount = memberJpaRepository.count();
-        assertThat(deletedCount).isEqualTo(0);
+        assertThat(deletedCount).isEqualTo(5);
     }
 
     @Test
@@ -111,7 +109,7 @@ class MemberJpaRepositoryTest {
 
         // then
         assertThat(members.size()).isEqualTo(3);
-        assertThat(totalCount).isEqualTo(5);
+        assertThat(totalCount).isEqualTo(6);
 
         for (Member member : members) {
             System.out.println("member = " + member);
@@ -131,6 +129,6 @@ class MemberJpaRepositoryTest {
         int resultCount = memberJpaRepository.bulkAgePlus(20);
 
         // then
-        assertThat(resultCount).isEqualTo(3);
+        assertThat(resultCount).isEqualTo(6);
     }
 }

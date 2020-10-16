@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@Rollback(false)
 class MemberRepositoryTest {
 
     @PersistenceContext
@@ -357,5 +355,53 @@ class MemberRepositoryTest {
             System.out.println("username = " + nestedClosedProjections.getUsername());
             System.out.println("teamName = " + nestedClosedProjections.getTeam().getName());
         }
+    }
+
+    /**
+     * Dirty Checking 테스트
+     */
+    @Test
+    public void change_username() {
+        Team team = new Team("teamA");
+        teamRepository.save(team);
+
+        Member member = new Member("hyoseok", 29, team);
+        memberRepository.save(member);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new NoSuchElementException(""));
+
+        System.out.println("findMember.getUsername() = " + findMember.getUsername());
+
+        findMember.changeUsername("change hyoseok");
+
+        entityManager.flush();
+        entityManager.clear();
+    }
+
+    /**
+     * Dirty Checking 테스트
+     */
+    @Test
+    public void unchange_username() {
+        Team team = new Team("teamA");
+        teamRepository.save(team);
+
+        Member member = new Member("hyoseok", 29, team);
+        memberRepository.save(member);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new NoSuchElementException(""));
+
+        findMember.changeUsername("hyoseok");
+
+        entityManager.flush();
+        entityManager.clear();
     }
 }
